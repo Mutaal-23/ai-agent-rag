@@ -1,0 +1,107 @@
+Before using iPhone, review the iPhone User Guide at
+support.apple.com/guide/iphone. Retain documentation
+for future reference.
+Safety and Handling
+See “Safety, handling, and support” in the iPhone
+User Guide.
+Exposure to Radio Frequency
+On iPhone, go to Settings > General > Legal &
+Regulatory > RF Exposure. Or go to apple.com/
+legal/rfexposure.
+Battery and Charging
+An iPhone battery should only be repaired by a trained
+technician to avoid battery damage, which could cause
+overheating, fire, or injury. Batteries should be recycled
+or disposed of separately from household waste and
+according to local environmental laws and guidelines. For
+information about Apple lithium-ion batteries and battery
+service and recycling, go to apple.com/batteries/service-
+and-recycling. For information about charging, see
+“Important safety information” in the iPhone User Guide.
+Lasers
+The proximity sensor and the front camera system
+contain one or more lasers. These laser systems may be
+disabled for safety reasons if the device is damaged or
+malfunctions. If you receive a notification on your iPhone
+that the laser system is disabled, you should always have
+it repaired by Apple or an authorized service provider.
+Improper repair, modification, or use of non-genuine
+Apple components in the laser systems may prevent the
+safety mechanisms from functioning properly, and could
+cause hazardous exposure and injury to eyes or skin.
+Class 1 Laser Information
+This device is classified as a Class 1 Laser product per IEC
+60825-1 Ed. 3. This device complies with 21 CFR 1040.10
+and 1040.11, except for conformance with IEC 60825-1
+Ed. 3., as described in Laser Notice No. 56, dated May 8,
+2019. Caution: This device contains one or more lasers.
+Use other than as described in the user guide, repair, or
+disassembly may cause damage, which could result in
+hazardous exposure to infrared laser emissions that are
+not visible. This equipment should be serviced by Apple
+or an authorized service provider.
+CLASS 1 LASER PRODUCT
+Hearing Aid Compatibility (HAC)
+Go to apple.com/support/hac, or see “Use hearing
+devices” in the iPhone User Guide.
+Avoid Hearing Damage
+To prevent possible hearing damage, do not listen at
+high volume levels for long periods. More information
+about sound and hearing is available online at apple.com/
+sound and in “Important safety information” in the
+iPhone User Guide.
+Medical Device Interference
+iPhone contains magnets as well as components and/
+or radios that may interfere with medical devices. See
+“Important safety information” in the iPhone User Guide.
+Regulatory
+Regulatory certification information is available on-device.
+Go to Settings > General > Legal & Regulatory. Additional
+regulatory information is in “Safety, handling, and
+support” in the iPhone User Guide.
+FCC and ISED Canada Compliance
+This device complies with part 15 of the FCC Rules and
+ISED Canada licence-exempt RSS standard(s). Operation
+is subject to the following two conditions: (1) this device
+may not cause harmful interference, and (2) this device
+must accept any interference received, including
+interference that may cause undesired operation.
+Disposal and Recycling Information
+The symbol above means that according to local laws
+and regulations your product and/or its battery shall be
+disposed of separately from household waste. When this
+product reaches its end of life, take it to a collection point
+designated by local authorities. The separate collection
+and recycling of your product and/or its battery at the
+time of disposal will help conserve natural resources and
+ensure that it is recycled in a manner that protects human
+health and the environment. For information about Apple’s
+recycling program, recycling collection points, restricted
+substances, and other environmental initiatives, visit
+apple.com/environment.
+Apple One-Year Limited Warranty Summary
+Apple warrants the included hardware product and
+accessories against defects in materials and workmanship
+for one year from the date of original retail purchase.
+Apple does not warrant against normal wear and tear,
+nor damage caused by accident or abuse. To obtain
+service, call Apple or visit an Apple Store or an Apple
+Authorized Service Provider—available service options are
+dependent on the country in which service is requested
+and may be restricted to the original country of sale. Call
+charges and international shipping charges may apply,
+depending on the location. Subject to the full terms and
+detailed information on obtaining service available at
+apple.com/legal/warranty and support.apple.com, if you
+submit a valid claim under this warranty, Apple will either
+repair, replace, or refund your hardware device at its own
+discretion. Warranty benefits are in addition to rights
+provided under local consumer laws. You may be required
+to furnish proof of purchase details when making a claim
+under this warranty.
+© 2025 Apple Inc. All rights reserved. Apple, the Apple
+logo, and iPhone are trademarks of Apple Inc., registered
+in the U.S. and other countries and regions. Apple Store
+is a service mark of Apple Inc., registered in the U.S. and
+other countries and regions.
+Printed in XXXX. XX034-07076-A

@@ -1,0 +1,17 @@
+# API keys & secrets
+.env
+apiekyy.txt
+
+# Python temporary files
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+
+# ChromaDB database files
+.chroma_db/
+chroma_data/
+
+# OS junk
+.DS_Store
