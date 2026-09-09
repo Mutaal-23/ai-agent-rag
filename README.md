@@ -1,12 +1,14 @@
-# AI Agent with RAG + Live API Tools
+# AI Agent with RAG + Live API Tools + Multi-Agent Memory
 
-A production-style agentic AI system built with **LangGraph, LangChain, Google Gemini, and FastAPI**. It answers user questions by combining three capabilities:
+A production-style agentic AI system built with **LangGraph, LangChain, Google Gemini, and FastAPI**. It answers user questions by combining:
 
-1. **Knowledge-base search (RAG)** — retrieves answers from a local document store (ChromaDB)
+1. **Knowledge-base search (RAG)** — hybrid retrieval (semantic + keyword) from a local ChromaDB store
 2. **Live API calls** — fetches real-time weather from the Open-Meteo API
-3. **Plain reasoning** — answers general questions directly, no tools needed
+3. **Session memory** — every conversation stored in SQLite, survives server restarts
+4. **Multi-agent orchestration** — Researcher → Writer → Critic pipeline with automated review
+5. **Plain reasoning** — answers general questions directly, no tools needed
 
-The agent decides on its own when to search the knowledge base, when to call the API, or when to just answer. Everything is exposed through a clean REST API.
+The system decides on its own when to search the knowledge base, call the API, or just answer, and a QA critic verifies every response before it is delivered.
 
 ## Architecture
 
@@ -17,28 +19,31 @@ User question
 POST /api/v1/chat  (FastAPI)
       │
       ▼
-┌─────────────────────────────┐
-│  LangGraph Agent (ReAct)    │
-│  ┌───────────┐              │
-│  │ chatbot   │  LLM decides │
-│  │ (Gemini)  │  tool or not │
-│  └─────┬─────┘              │
-│        │ tool call          │
-│        ▼                    │
-│  ┌───────────┐              │
-│  │ tools     │ RAG / weather│
-│  └─────┬─────┘              │
-│        └───────► back to chatbot until answer ready
-└─────────────────────────────┘
+┌───────────────────────────────────────────────────┐
+│  Multi-Agent Graph (LangGraph)                    │
+│  ┌────────────┐    ┌────────┐    ┌─────────────┐  │
+│  │ Researcher │───▶│ Writer │───▶│   Critic    │  │
+│  │ (ReAct +   │    │ polish│    │ QA score 0-100│ │
+│  │  tools +   │    │ draft │    └──────┬──────┘   │
+│  │  memory)   │    └────────┘         │           │
+│  └────────────┘                        │ score<70 │
+│                     ┌──────────────────┘  & retries
+│                     ▼                      left       │
+│                back to Writer 🔄                      │
+└───────────────────────────────────────────────────┘
       │
       ▼
-{ "status", "response", "tools_used" }
+{ "status", "session_id", "response", "tools_used",
+  "agents_used", "critic_note" }
 ```
 
-- `ingest.py` — splits `data/*.txt` into chunks and stores embeddings in ChromaDB
-- `rag_tool.py` — retrieves the top chunks for a question (RAG retrieval)
+Files:
+- `ingest.py` — loads `.txt`, `.json`, `.pdf`, `.html`, and web URLs (`data/urls.txt`) into ChromaDB
+- `rag_tool.py` — hybrid retrieval (vector + keyword, fused with Reciprocal Rank Fusion)
 - `api_tool.py` — live weather via Open-Meteo
-- `agent.py` — the LangGraph ReAct agent that ties it together
+- `agent.py` — the ReAct agent with SQLite session memory
+- `multi_agent.py` — Researcher → Writer → Critic orchestration
+- `eval.py` — LLM-judge evaluation (faithfulness / relevancy / context precision)
 - `main.py` — FastAPI server
 
 ## Prerequisites
@@ -61,12 +66,16 @@ pip install -r requirements.txt
 cp .env.example .env
 # ... open .env and paste your GEMINI_API_KEY
 
-# 4. Put your knowledge documents in data/ (txt files)
+# 4. Put your knowledge documents in data/
+#    (.txt, .json, .pdf, .html — or list web pages in data/urls.txt, one per line)
 
-# 5. Build the knowledge base (first-time indexing)
+# 5. Build the knowledge base
 python ingest.py
 
-# 6. Start the server
+# 6. Optional: run the evaluation report
+python eval.py
+
+# 7. Start the server
 uvicorn main:app --reload
 ```
 
@@ -88,19 +97,29 @@ Ask the agent anything.
 
 Request:
 ```json
-{ "message": "What is the policy on lasers?" }
+{
+  "message": "What is the policy on lasers?",
+  "session_id": "user-123"
+}
 ```
+
+`session_id` is optional but recommended — pass the same id to keep a conversation's memory across turns. If omitted, it defaults to `"default"`.
 
 Response:
 ```json
 {
   "status": "success",
+  "session_id": "user-123",
   "response": "According to the safety guidelines...",
-  "tools_used": ["knowledge_base"]
+  "tools_used": ["knowledge_base"],
+  "agents_used": ["researcher", "writer", "critic"],
+  "critic_note": "All facts verified."
 }
 ```
 
-`tools_used` reports which tools the agent executed — `knowledge_base`, `weather`, or `[]` (answered directly).
+- `tools_used` — which tools the researcher executed: `knowledge_base`, `weather`, or `[]` (answered directly)
+- `agents_used` — the multi-agent pipeline that ran
+- `critic_note` — QA feedback (and when the critic scores < 70 the writer auto-rewrites once)
 
 ### `GET /health`
 

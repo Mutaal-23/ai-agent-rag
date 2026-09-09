@@ -676,3 +676,29 @@ Use this checklist to track your progress:
 - [ ] Phase 4.1: Git repo set up
 - [ ] Phase 4.2: Loom video recorded
 - [ ] Phase 4.3: Submitted on Upwork
+
+---
+
+## Bonus Modules (Implemented, `full` branch)
+
+The original 4-phase plan is complete. The following job-requirement extras were
+added afterwards. All are committed on the `full` branch.
+
+| Module | File(s) | What it does |
+|--------|---------|--------------|
+| Session memory | `agent.py`, `main.py` | SQLite checkpointer; conversations survive restarts via `session_id` (thread_id) |
+| Multi-source ingestion | `ingest.py`, `data/` | Loads `.txt`, `.json`, `.pdf`, `.html`, and web URLs (`data/urls.txt`); collects metadata; wipes collection on re-run so nothing duplicates |
+| Hybrid search | `rag_tool.py` | Vector (semantic) + keyword matching fused with Reciprocal Rank Fusion (RRF) |
+| Evaluation harness | `eval.py` | LLM judge scores faithfulness / response_relevancy / context_precision; retry guard against "not in context" misses |
+| Multi-agent orchestration | `multi_agent.py`, `main.py` | Researcher (reuses the ReAct agent + tools + memory) → Writer → Critic with automated rewrite loop |
+
+Run order:
+```bash
+python ingest.py        # rebuild knowledge base (any sources)
+python eval.py          # run evaluation report
+python multi_agent.py   # try the multi-agent pipeline in CLI
+uvicorn main:app        # serve via API
+```
+
+Docker note: `docker compose up -d --build` rebuilds the container; `chroma_data`
+and `checkpoints.sqlite` are persisted via volumes.

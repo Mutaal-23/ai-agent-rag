@@ -1,9 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from langchain_core.messages import HumanMessage, AIMessage
-
-from agent import agent, to_text
+from multi_agent import multi_agent
 
 
 class ChatRequest(BaseModel):
@@ -16,6 +14,8 @@ class ChatResponse(BaseModel):
     session_id: str
     response: str
     tools_used: list
+    agents_used: list[str]
+    critic_note: str | None = None
 
 
 app = FastAPI()
@@ -29,22 +29,16 @@ def health():
 @app.post("/api/v1/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
     session_id = req.session_id or "default"
-    config = {"configurable": {"thread_id": session_id}}
 
-    result = agent.invoke(
-        {"messages": [HumanMessage(content=req.message)]}, config=config
+    state = multi_agent.invoke(
+        {"question": req.message, "session_id": session_id}
     )
 
-    final_message = result["messages"][-1]
-    answer = to_text(final_message.content)
-
-    tools_used = []
-    for msg in result["messages"]:
-        if isinstance(msg, AIMessage):
-            for call in msg.tool_calls:
-                if call["name"] not in tools_used:
-                    tools_used.append(call["name"])
-
     return ChatResponse(
-        status="success", session_id=session_id, response=answer, tools_used=tools_used
+        status="success",
+        session_id=session_id,
+        response=state.get("draft") or "No answer generated.",
+        tools_used=state.get("research_tools", []),
+        agents_used=["researcher", "writer", "critic"],
+        critic_note=state.get("critique"),
     )
