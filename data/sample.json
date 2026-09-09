@@ -1,0 +1,20 @@
+{
+  "company": "Acme Wireless",
+  "policies": [
+    {
+      "title": "Remote Work Policy",
+      "rule": "Employees may work remotely up to 3 days per week with manager approval.",
+      "effective": "2025-01-01"
+    },
+    {
+      "title": "Vacation Policy",
+      "rule": "Every full-time employee receives 25 paid leave days per year.",
+      "effective": "2025-01-01"
+    },
+    {
+      "title": "Expense Policy",
+      "rule": "Expenses above 500 USD require prior manager approval.",
+      "effective": "2025-06-01"
+    }
+  ]
+}
