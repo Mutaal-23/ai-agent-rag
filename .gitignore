@@ -15,3 +15,5 @@ chroma_data/
 
 # OS junk
 .DS_Store
+# Conversation memory
+checkpoints.sqlite

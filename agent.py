@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import os
+import sqlite3
 from typing import Annotated, TypedDict
 
 from langchain_core.messages import BaseMessage
@@ -9,6 +10,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
+from langgraph.checkpoint.sqlite import SqliteSaver
 
 from rag_tool import search_knowledge_base
 from api_tool import get_weather
@@ -70,13 +72,21 @@ graph.add_node("tools", ToolNode(tools))
 graph.add_edge(START, "chatbot")
 graph.add_conditional_edges("chatbot", router, {"tools": "tools", END: END})
 graph.add_edge("tools", "chatbot")
-agent = graph.compile()
+
+conn = sqlite3.connect("checkpoints.sqlite", check_same_thread=False)
+checkpointer = SqliteSaver(conn)
+
+agent = graph.compile(checkpointer=checkpointer)
 
 if __name__ == "__main__":
     import sys
     from langchain_core.messages import HumanMessage
 
     question = sys.argv[1] if len(sys.argv) > 1 else "What is the policy on lasers?"
-    print(f"USER: {question}", flush=True)
-    result = agent.invoke({"messages": [HumanMessage(content=question)]})
+    session = sys.argv[2] if len(sys.argv) > 2 else "default"
+    print(f"USER ({session}): {question}", flush=True)
+    config = {"configurable": {"thread_id": session}}
+    result = agent.invoke(
+        {"messages": [HumanMessage(content=question)]}, config=config
+    )
     print(f"AGENT: {to_text(result['messages'][-1].content)}", flush=True)

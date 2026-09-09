@@ -8,10 +8,12 @@ from agent import agent, to_text
 
 class ChatRequest(BaseModel):
     message: str
+    session_id: str | None = None
 
 
 class ChatResponse(BaseModel):
     status: str
+    session_id: str
     response: str
     tools_used: list
 
@@ -26,7 +28,12 @@ def health():
 
 @app.post("/api/v1/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
-    result = agent.invoke({"messages": [HumanMessage(content=req.message)]})
+    session_id = req.session_id or "default"
+    config = {"configurable": {"thread_id": session_id}}
+
+    result = agent.invoke(
+        {"messages": [HumanMessage(content=req.message)]}, config=config
+    )
 
     final_message = result["messages"][-1]
     answer = to_text(final_message.content)
@@ -38,4 +45,6 @@ def chat(req: ChatRequest):
                 if call["name"] not in tools_used:
                     tools_used.append(call["name"])
 
-    return ChatResponse(status="success", response=answer, tools_used=tools_used)
+    return ChatResponse(
+        status="success", session_id=session_id, response=answer, tools_used=tools_used
+    )
