@@ -33,13 +33,27 @@ def weather(city: str) -> str:
 
 tools = [knowledge_base, weather]
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-3.5-flash-lite",
-    google_api_key=os.getenv("GEMINI_API_KEY"),
-    max_output_tokens=1024,
-)
+MODELS = ["gemini-3.5-flash-lite", "gemini-3.5-flash"]
 
-llm_with_tools = llm.bind_tools(tools)
+_models = {
+    name: ChatGoogleGenerativeAI(
+        model=name,
+        google_api_key=os.getenv("GEMINI_API_KEY"),
+        max_output_tokens=1024,
+    )
+    for name in MODELS
+}
+
+
+def _invoke_with_tools(messages) -> BaseMessage:
+    last_error = None
+    for name, model in _models.items():
+        try:
+            return model.bind_tools(tools).invoke(messages)
+        except Exception as exc:
+            print(f"[agent] model {name} failed, trying next: {exc}", flush=True)
+            last_error = exc
+    raise last_error
 
 
 class AgentState(TypedDict):
@@ -47,7 +61,7 @@ class AgentState(TypedDict):
 
 
 def chatbot(state: AgentState) -> dict:
-    response = llm_with_tools.invoke(state["messages"])
+    response = _invoke_with_tools(state["messages"])
     return {"messages": [response]}
 
 

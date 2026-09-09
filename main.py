@@ -3,6 +3,15 @@ from pydantic import BaseModel
 
 from multi_agent import multi_agent
 
+import logging
+import time
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+)
+logger = logging.getLogger("rag-agent")
+
 
 class ChatRequest(BaseModel):
     message: str
@@ -28,13 +37,14 @@ def health():
 
 @app.post("/api/v1/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
+    start = time.perf_counter()
     session_id = req.session_id or "default"
 
     state = multi_agent.invoke(
         {"question": req.message, "session_id": session_id}
     )
 
-    return ChatResponse(
+    response = ChatResponse(
         status="success",
         session_id=session_id,
         response=state.get("draft") or "No answer generated.",
@@ -42,3 +52,13 @@ def chat(req: ChatRequest):
         agents_used=["researcher", "writer", "critic"],
         critic_note=state.get("critique"),
     )
+
+    logger.info(
+        "session=%s len=%d tools=%s critic=%s took=%.2fs",
+        session_id,
+        len(req.message),
+        response.tools_used,
+        response.critic_note,
+        time.perf_counter() - start,
+    )
+    return response
